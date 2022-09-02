@@ -1,0 +1,1683 @@
+openapi: 3.0.0
+info:
+  title: sistema-api
+  description: Api para o Sistema de Gerenciamento de Entregas
+  version: 1.0.0
+servers:
+- url: https://localhost:8080/v1
+  description: API Mocking
+paths:
+  /login:
+    post:
+      tags:
+      - Login
+      description: Faz o envio dos dados de login.
+      operationId: v1LoginPOST
+      parameters:
+      - name: login
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: senha
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Login
+          headers:
+            Set-Cookie:
+              description: |
+                Contem um cookie de sessão chamadado `connect.sid`. Envie esse cookie nas próximas requisições.
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Falha na autenticação. Verifique os dados do usuário.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401'
+      x-swagger-router-controller: Login
+  /usuario:
+    get:
+      tags:
+      - Usuário
+      description: Retorna os dados de usuário.
+      operationId: usuarioGET
+      parameters:
+      - name: id
+        in: query
+        description: ID do funcionario
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: usuário não encontrado
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Usurio
+    post:
+      tags:
+      - Usuário
+      description: cadastra um novo usuário.
+      operationId: usuarioPOST
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/v1_usuario_body_1'
+        required: true
+      responses:
+        "201":
+          description: usuario registrado com sucesso
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Usurio
+    delete:
+      tags:
+      - Usuário
+      operationId: usuarioDELETE
+      parameters:
+      - name: user_id
+        in: header
+        description: ID única do usuário.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: usuário removido com sucesso
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: usuário não encontrado
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Usurio
+    patch:
+      tags:
+      - Usuário
+      operationId: usuarioPATCH
+      parameters:
+      - name: email
+        in: header
+        description: e-mail do usuário.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: telefone
+        in: header
+        description: telefone do usuário.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: whatsapp
+        in: header
+        description: caso o telefone seja do whatsapp.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: boolean
+      - name: oauthgoogle
+        in: header
+        description: oauth do usuário.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: oauthhotmail
+        in: header
+        description: oauth do usuário.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: nome
+        in: header
+        description: nome do usuário.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1_usuario_body'
+      responses:
+        "200":
+          description: usuario atualizado com sucesso
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: usuário não encontrado
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Usurio
+  /usuario/credenciais:
+    patch:
+      tags:
+      - Usuário
+      description: Permite alterar a senha do login
+      operationId: usuarioCredenciaisPATCH
+      parameters:
+      - name: login
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: senha
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: nova_senha
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Senha alterada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_7'
+        "401":
+          description: Não foi possivel efetuar a alteração. Verifique os dados do
+            usuário.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401_1'
+      security:
+      - ApiKeyAuth: []
+      x-swagger-router-controller: Usurio
+  /guias:
+    get:
+      tags:
+      - Guias
+      description: retorna lista de todas as guias de uma competencia
+      operationId: guiasGET
+      parameters:
+      - name: mes
+        in: query
+        description: número do mês.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 1
+      - name: ano
+        in: query
+        description: número do ano.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: 2020
+      responses:
+        "200":
+          description: Usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foram encontradas guias para esses parâmetros.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Guias
+    post:
+      tags:
+      - Guias
+      description: faz o envio de uma guia para armazenamento
+      operationId: guiasPOST
+      parameters:
+      - name: name
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: tipoGuia
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: guia
+        in: query
+        required: true
+        style: form
+        explode: true
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+              x-content-type: application/pdf
+      responses:
+        "201":
+          description: Guia enviada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foram encontradas guias.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Guias
+  /guias/lista:
+    get:
+      tags:
+      - Guias
+      description: retorna lista de todas as guias de uma competencia
+      operationId: guiasListaGET
+      parameters:
+      - name: mes
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 1
+      - name: ano
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: 2022
+      responses:
+        "200":
+          description: Usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_8'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foram encontradas guias para esses parâmetros.
+      security:
+      - ApiKeyAuth: []
+      x-swagger-router-controller: Guias
+  /empresas:
+    get:
+      tags:
+      - Empresas
+      description: retorna lista de todas as empresas relacionadas ao usuário
+      operationId: empresasGET
+      parameters:
+      - name: email
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foi encantrada empresa vinculada.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Empresas
+  /v1/funcionarios:
+    get:
+      tags:
+      - Funcionários
+      description: retorna a lista de todos os funcionarios da empresa
+      operationId: v1FuncionariosGET
+      parameters:
+      - name: empresaId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                - idfuncionario: a11h6dk1y5u9811kg6k8hg3
+                  nmfuncionario: JOAO DA SILVA
+                - idfuncionario: afjfk18f181s61hjl3sj16m
+                  nmfuncionario: MARIA DA SILVA
+                items:
+                  type: string
+                x-content-type: application/json
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foram encontrados funcionários.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Funcionrios
+  /ferias:
+    get:
+      tags:
+      - Férias
+      description: retorna o último período aquisitivo de férias do funcionário.
+      operationId: feriasGET
+      parameters:
+      - name: funcId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: a11h6dk1y5u9811kg6k8hg3
+      responses:
+        "200":
+          description: Férias
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foram encontrados funcionários.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Frias
+  /modulos:
+    get:
+      tags:
+      - Módulos
+      description: retorna a lista de módulos disponiveis.
+      operationId: modulosGET
+      parameters:
+      - name: user_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 1
+      responses:
+        "200":
+          description: Modulos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_5'
+              example:
+              - mod_id: "1"
+                mod_nome: Emissão de Relatórios
+              - mod_id: "2"
+                mod_nome: Emissão de Guias
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foi encontrado o modulo solicitado.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Mdulos
+    put:
+      tags:
+      - Módulos
+      description: altera um determinado módulo.
+      operationId: modulosPUT
+      parameters:
+      - name: mod_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 1
+      - name: mod_nome
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: Emissão de Relatórios
+      - name: mod_nivel
+        in: query
+        description: |
+          Define o nivel de acesso ao módulo: Administrador (1), Responsável da Empresa (2) ou Outorgado (3).
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 2
+      responses:
+        "200":
+          description: Modulos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foi encontrado o modulo solicitado.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Mdulos
+    post:
+      tags:
+      - Módulos
+      description: adiciona um novo módulo.
+      operationId: v1ModulosPOST
+      parameters:
+      - name: mod_nome
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: Emissão de Relatórios
+      - name: mod_nivel
+        in: query
+        description: |
+          Define o nivel de acesso ao módulo: Administrador (1), Responsável da Empresa (2) ou Outorgado (3).
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 2
+      responses:
+        "201":
+          description: Modulos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Mdulos
+    delete:
+      tags:
+      - Módulos
+      description: remove um determinado módulo.
+      operationId: modulosDELETE
+      parameters:
+      - name: mod_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 1
+      responses:
+        "201":
+          description: Modulos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "404":
+          description: Módulo não encontrado.
+      x-swagger-router-controller: Mdulos
+  /v1/contratacoes:
+    get:
+      tags:
+      - Contratações
+      description: busca lista de contratações de uma empresa.
+      operationId: v1ContratacoesGET
+      parameters:
+      - name: cdempresa
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Contratacoes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Contrataes
+    post:
+      tags:
+      - Contratações
+      description: Adiciona uma nova contratação.
+      operationId: v1ContratacoesPOST
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/v1_contratacoes_body'
+        required: true
+      responses:
+        "200":
+          description: Cadastro de contratação aceito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Contrataes
+    patch:
+      tags:
+      - Contratações
+      description: atualiza o status da contratação
+      operationId: v1ContratacoesPATCH
+      parameters:
+      - name: contratacao_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: status
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        "201":
+          description: Contratacoes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Contratação não encontrada.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Contrataes
+  /contratacoes/candidato:
+    get:
+      tags:
+      - Contratações
+      description: busca os dados da contratação.
+      operationId: v1ContratacoesCandidatoGET
+      parameters:
+      - name: contratacao_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "201":
+          description: Candidato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201_1'
+        "404":
+          description: Não foi encontrado candidato para os parametros da consulta.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Contrataes
+    post:
+      tags:
+      - Contratações
+      description: Adiciona uma nova contratação.
+      operationId: contratacoesCandidatoPOST
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/contratacoes_candidato_body'
+        required: true
+      responses:
+        "201":
+          description: Contratacoes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: Contrataes
+  /horarios:
+    get:
+      tags:
+      - Dados Adicionais do Contrato
+      description: busca os dados de horário.
+      operationId: v1HorariosGET
+      parameters:
+      - name: cdempresa
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Horários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  properties:
+                    descricao:
+                      type: object
+                    dom_entrada:
+                      type: string
+                    dom_almoco_saida:
+                      type: string
+                    dom_amoco_retorno:
+                      type: string
+                    dom_saida:
+                      type: string
+                    dom_intervalo:
+                      type: string
+                    seg_entrada:
+                      type: string
+                    seg_almoco_saida:
+                      type: string
+                    seg_amoco_retorno:
+                      type: string
+                    seg_saida:
+                      type: string
+                    seg_intervalo:
+                      type: string
+                    ter_entrada:
+                      type: string
+                    ter_almoco_saida:
+                      type: string
+                    ter_amoco_retorno:
+                      type: string
+                    ter_saida:
+                      type: string
+                    ter_intervalo:
+                      type: string
+                    quar_entrada:
+                      type: string
+                    quar_almoco_saida:
+                      type: string
+                    quar_amoco_retorno:
+                      type: string
+                    quar_saida:
+                      type: string
+                    quar_intervalo:
+                      type: string
+                    quin_entrada:
+                      type: string
+                    quin_almoco_saida:
+                      type: string
+                    quin_amoco_retorno:
+                      type: string
+                    quin_saida:
+                      type: string
+                    quin_intervalo:
+                      type: string
+                    sex_entrada:
+                      type: string
+                    sex_almoco_saida:
+                      type: string
+                    sex_amoco_retorno:
+                      type: string
+                    sex_saida:
+                      type: string
+                    sex_intervalo:
+                      type: string
+                    sab_entrada:
+                      type: string
+                    sab_almoco_saida:
+                      type: string
+                    sab_amoco_retorno:
+                      type: string
+                    sab_saida:
+                      type: string
+                    sab_intervalo:
+                      type: string
+                  example: "[{\"descricao\":\"SEGUNDA A SÁBADO DAS 13:00 ÀS 22:00\"\
+                    ,\"dom_entrada\":\"\",\"dom_almoco_saida\":\"\",\"dom_amoco_retorno\"\
+                    :\"\",\"dom_saida\":\"\",\"dom_intervalo\":\"\",\"seg_entrada\"\
+                    :\"13:00\",\"seg_almoco_saida\":\"17:00\",\"seg_amoco_retorno\"\
+                    :\"18:00\",\"seg_saida\":\"22:00\",\"seg_intervalo\":\"\",\"ter_entrada\"\
+                    :\"13:00\",\"ter_almoco_saida\":\"17:00\",\"ter_amoco_retorno\"\
+                    :\"18:00\",\"ter_saida\":\"22:00\",\"ter_intervalo\":\"\",\"quar_entrada\"\
+                    :\"13:00\",\"quar_almoco_saida\":\"17:00\",\"quar_amoco_retorno\"\
+                    :\"18:00\",\"quar_saida\":\"22:00\",\"quar_intervalo\":\"\",\"\
+                    quin_entrada\":\"13:00\",\"quin_almoco_saida\":\"17:00\",\"quin_amoco_retorno\"\
+                    :\"18:00\",\"quin_saida\":\"22:00\",\"quin_intervalo\":\"\",\"\
+                    sex_entrada\":\"13:00\",\"sex_almoco_saida\":\"17:00\",\"sex_amoco_retorno\"\
+                    :\"18:00\",\"sex_saida\":\"22:00\",\"sex_intervalo\":\"\",\"sab_entrada\"\
+                    :\"08:00\",\"sab_almoco_saida\":\"\",\"sab_amoco_retorno\":\"\"\
+                    ,\"sab_saida\":\"12:00\",\"sab_intervalo\":\"00:15\"}]"
+                x-content-type: application/json
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foi encontrado horário para essa empresa.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    post:
+      tags:
+      - Dados Adicionais do Contrato
+      description: cadastra um horário.
+      operationId: horariosPOST
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/v1_horarios_body'
+        required: true
+      responses:
+        "201":
+          description: Horário cadastrado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    delete:
+      tags:
+      - Dados Adicionais do Contrato
+      description: remove um horário cadastrado.
+      operationId: v1HorariosDELETE
+      parameters:
+      - name: hora_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Horário removido com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Horário não encontrado.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    patch:
+      tags:
+      - Dados Adicionais do Contrato
+      description: altera um horário de trabalho já cadastrado.
+      operationId: v1HorariosPATCH
+      requestBody:
+        description: |
+          Altera os dados de um determinado horário
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/v1_horarios_body_1'
+        required: true
+      responses:
+        "201":
+          description: Horário alterado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foram encontrados funcionários.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+  /funcao:
+    get:
+      tags:
+      - Dados Adicionais do Contrato
+      description: busca as funções disponiveis para a empresa.
+      operationId: v1FuncaoGET
+      parameters:
+      - name: cdempresa
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "201":
+          description: Função
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201_2'
+              example:
+              - cbo_id: "252405"
+                func_nome: Analista de Recursos Humanos
+              - cbo_id: "411005"
+                func_nome: Auxiliar de Escritório
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Cadastro da função não encontrado.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    post:
+      tags:
+      - Dados Adicionais do Contrato
+      description: adiciona uma função.
+      operationId: v1FuncaoPOST
+      parameters:
+      - name: func_nome
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: cbo_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Cadastro de horário recepcionado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    delete:
+      tags:
+      - Dados Adicionais do Contrato
+      description: remove uma função.
+      operationId: v1FuncaoDELETE
+      parameters:
+      - name: func_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Função removida com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Cadastro da função não encontrado.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    patch:
+      tags:
+      - Dados Adicionais do Contrato
+      description: Altera uma função.
+      operationId: v1FuncaoPATCH
+      parameters:
+      - name: func_nome
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: cbo_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Função alterada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Cadastro da função não encontrado.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+  /cbo:
+    get:
+      tags:
+      - Dados Adicionais do Contrato
+      description: busca os dados de CBO.
+      operationId: cboGET
+      parameters:
+      - name: cbo_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "201":
+          description: CBO encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201_3'
+              example:
+                cbo_id: "252405"
+                ocupacao: Analista de Recursos Humanos
+                grande_grupo: PROFISSIONAIS DAS CIÊNCIAS E DAS ARTES
+                subgrupo_principal: PROFISSIONAIS DAS CIÊNCIAS SOCIAIS E HUMANAS
+                subgrupo: "PROFISSIONAIS DE RELAÇÕES PÚBLICAS, PUBLICIDADE, MARKETING\
+                  \ E COMERCIALIZAÇÃO"
+                familia: Profissionais de recursos humanos
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: Não foi encontrado dados de CBO.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    post:
+      tags:
+      - Dados Adicionais do Contrato
+      description: adiciona um novo CBO.
+      operationId: cboPOST
+      requestBody:
+        description: |
+          Adiciona um novo CBO.
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/v1_cbo_body'
+        required: true
+      responses:
+        "200":
+          description: CBO cadastrado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+    delete:
+      tags:
+      - Dados Adicionais do Contrato
+      description: Remove um CBO do cadastro.
+      operationId: v1CboDELETE
+      parameters:
+      - name: cbo_id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "201":
+          description: CBO removido com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: Access token is missing or invalid
+        "404":
+          description: CBO não encontrado no cadastro.
+      security:
+      - bearerAuth: []
+      x-swagger-router-controller: DadosAdicionaisDoContrato
+  /status:
+    get:
+      tags:
+      - Status do Servidor
+      description: Teste para verificação de status da API.
+      operationId: statusGET
+      responses:
+        "200":
+          description: |
+            Retorno do status 200 do servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_7'
+      x-swagger-router-controller: StatusDoServidor
+components:
+  schemas:
+    inline_response_200_5:
+      type: object
+      properties:
+        mod_id:
+          type: integer
+        mod_nome:
+          type: string
+      example:
+        mod_nome: mod_nome
+        mod_id: 0
+    inline_response_200_6:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - sucesso
+        contratacoes_id:
+          type: array
+          items:
+            type: integer
+      example:
+      - "0001"
+      - "0002"
+      - "0003"
+    v1_horarios_body_1:
+      type: object
+      properties:
+        descricao:
+          type: string
+        dom_entrada:
+          type: string
+        dom_almoco_saida:
+          type: string
+        dom_amoco_retorno:
+          type: string
+        dom_saida:
+          type: string
+        dom_intervalo:
+          type: string
+        seg_entrada:
+          type: string
+        seg_almoco_saida:
+          type: string
+        seg_amoco_retorno:
+          type: string
+        seg_saida:
+          type: string
+        seg_intervalo:
+          type: string
+        ter_entrada:
+          type: string
+        ter_almoco_saida:
+          type: string
+        ter_amoco_retorno:
+          type: string
+        ter_saida:
+          type: string
+        ter_intervalo:
+          type: string
+        quar_entrada:
+          type: string
+        quar_almoco_saida:
+          type: string
+        quar_amoco_retorno:
+          type: string
+        quar_saida:
+          type: string
+        quar_intervalo:
+          type: string
+        quin_entrada:
+          type: string
+        quin_almoco_saida:
+          type: string
+        quin_amoco_retorno:
+          type: string
+        quin_saida:
+          type: string
+        quin_intervalo:
+          type: string
+        sex_entrada:
+          type: string
+        sex_almoco_saida:
+          type: string
+        sex_amoco_retorno:
+          type: string
+        sex_saida:
+          type: string
+        sex_intervalo:
+          type: string
+        sab_entrada:
+          type: string
+        sab_almoco_saida:
+          type: string
+        sab_amoco_retorno:
+          type: string
+        sab_saida:
+          type: string
+        sab_intervalo:
+          type: string
+    v1_horarios_body:
+      type: object
+      properties:
+        descricao:
+          type: string
+        dom_entrada:
+          type: string
+        dom_almoco_saida:
+          type: string
+        dom_amoco_retorno:
+          type: string
+        dom_saida:
+          type: string
+        dom_intervalo:
+          type: string
+        seg_entrada:
+          type: string
+        seg_almoco_saida:
+          type: string
+        seg_amoco_retorno:
+          type: string
+        seg_saida:
+          type: string
+        seg_intervalo:
+          type: string
+        ter_entrada:
+          type: string
+        ter_almoco_saida:
+          type: string
+        ter_amoco_retorno:
+          type: string
+        ter_saida:
+          type: string
+        ter_intervalo:
+          type: string
+        quar_entrada:
+          type: string
+        quar_almoco_saida:
+          type: string
+        quar_amoco_retorno:
+          type: string
+        quar_saida:
+          type: string
+        quar_intervalo:
+          type: string
+        quin_entrada:
+          type: string
+        quin_almoco_saida:
+          type: string
+        quin_amoco_retorno:
+          type: string
+        quin_saida:
+          type: string
+        quin_intervalo:
+          type: string
+        sex_entrada:
+          type: string
+        sex_almoco_saida:
+          type: string
+        sex_amoco_retorno:
+          type: string
+        sex_saida:
+          type: string
+        sex_intervalo:
+          type: string
+        sab_entrada:
+          type: string
+        sab_almoco_saida:
+          type: string
+        sab_amoco_retorno:
+          type: string
+        sab_saida:
+          type: string
+        sab_intervalo:
+          type: string
+    v1_contratacoes_body:
+      required:
+      - cbo_id
+      - cdempresa
+      - data
+      - dt_contratacao
+      - email
+      - funcao
+      - hora_id
+      - mod_nome
+      - nome
+      - salario
+      - telefone
+      - tipo_contrato
+      - whatsapp
+      type: object
+      properties:
+        cdempresa:
+          type: integer
+        nome:
+          type: string
+        data:
+          type: string
+        funcao:
+          type: string
+        cbo_id:
+          type: string
+        hora_id:
+          type: integer
+        salario:
+          type: integer
+        tipo_contrato:
+          type: string
+        mod_nome:
+          type: string
+        email:
+          type: string
+        telefone:
+          type: integer
+        whatsapp:
+          type: boolean
+        dt_contratacao:
+          type: string
+    inline_response_200_1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - sucesso
+      example:
+        status: sucesso
+    inline_response_201:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - sucesso
+        contratacao_id:
+          type: integer
+      example:
+        contratacao_id: 0
+        status: sucesso
+    inline_response_200:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        nome:
+          type: string
+          enum:
+          - Nome do Usuário
+      example:
+        user_id: 0
+        nome: Nome do Usuário
+    inline_response_200_2:
+      type: object
+      properties:
+        competencia:
+          type: integer
+        tipo:
+          type: string
+          enum:
+          - Nome do Usuário
+        nome_arq:
+          type: string
+      example:
+      - competencia: "012022"
+        tipo: IRRF
+        nome_arq: DARF IRRF - 202201 VENC 20_02_2022.pdf
+      - competencia: "022022"
+        tipo: IRRF
+        nome_arq: DARF IRRF - 202202 VENC 20_03_2022.pdf
+    inline_response_201_1:
+      type: object
+      properties:
+        contratacao_id:
+          type: string
+        nome_pai:
+          type: string
+        nome_mae:
+          type: string
+        dt_nasc:
+          type: string
+        estado_nasc:
+          type: string
+        cidade_nasc:
+          type: string
+        n_cpf:
+          type: string
+        n_ctps:
+          type: string
+        dt_ctps:
+          type: string
+        n_rg:
+          type: string
+        dt_rg:
+          type: string
+        emitente_rg:
+          type: string
+        n_rua:
+          type: string
+        estado:
+          type: string
+        cidade:
+          type: string
+        bairro:
+          type: string
+      example:
+        estado: estado
+        cidade: cidade
+        nome_pai: nome_pai
+        bairro: bairro
+        dt_ctps: dt_ctps
+        cidade_nasc: cidade_nasc
+        estado_nasc: estado_nasc
+        emitente_rg: emitente_rg
+        n_cpf: n_cpf
+        dt_rg: dt_rg
+        n_rg: n_rg
+        n_rua: n_rua
+        nome_mae: nome_mae
+        contratacao_id: contratacao_id
+        n_ctps: n_ctps
+        dt_nasc: dt_nasc
+    contratacoes_candidato_body:
+      required:
+      - bairro
+      - cidade
+      - cidade_nasc
+      - dt_ctps
+      - dt_nasc
+      - dt_rg
+      - emitente_rg
+      - estado
+      - estado_nasc
+      - n_cpf
+      - n_ctps
+      - n_rg
+      - n_rua
+      - nome_mae
+      - nome_pai
+      type: object
+      properties:
+        nome_pai:
+          type: string
+        nome_mae:
+          type: string
+        dt_nasc:
+          type: string
+        estado_nasc:
+          type: string
+        cidade_nasc:
+          type: string
+        n_cpf:
+          type: string
+        n_ctps:
+          type: string
+        dt_ctps:
+          type: string
+        n_rg:
+          type: string
+        dt_rg:
+          type: string
+        emitente_rg:
+          type: string
+        n_rua:
+          type: string
+        estado:
+          type: string
+        cidade:
+          type: string
+        bairro:
+          type: string
+    inline_response_200_3:
+      type: object
+      properties:
+        cdempresa:
+          type: integer
+        nmempresa:
+          type: string
+          enum:
+          - Nome da Empresa
+      example:
+      - cdempresa: "0001"
+        nmempresa: EMPRESA EXEMPLO LTDA
+    inline_response_201_2:
+      type: object
+      properties:
+        cbo_id:
+          type: integer
+        func_nome:
+          type: string
+      example:
+        cbo_id: 0
+        func_nome: func_nome
+    inline_response_200_4:
+      type: object
+      properties:
+        idfuncionario:
+          type: string
+          example: a11h6dk1y5u9811kg6k8hg3
+        dtperiodoaquisinicial:
+          type: string
+          example: 2010-11-30T00:00:00.000Z
+        dtperiodoaquisfinal:
+          type: string
+          example: 2011-12-01T00:00:00.000Z
+      example:
+        idfuncionario: a11h6dk1y5u9811kg6k8hg3
+        dtperiodoaquisinicial: 2010-11-30T00:00:00.000Z
+        dtperiodoaquisfinal: 2011-12-01T00:00:00.000Z
+    inline_response_201_3:
+      type: object
+      properties:
+        cbo_id:
+          type: string
+          enum:
+          - sucesso
+        ocupacao:
+          type: string
+        grande_grupo:
+          type: string
+        subgrupo_principal:
+          type: string
+        subgrupo:
+          type: string
+        familia:
+          type: string
+      example:
+        cbo_id: sucesso
+        ocupacao: ocupacao
+        subgrupo: subgrupo
+        grande_grupo: grande_grupo
+        subgrupo_principal: subgrupo_principal
+        familia: familia
+    v1_usuario_body_1:
+      required:
+      - email
+      - nome
+      - tipo
+      type: object
+      properties:
+        email:
+          type: string
+        telefone:
+          type: integer
+        whatsapp:
+          type: boolean
+        oauthgoogle:
+          type: string
+        oauthhotmail:
+          type: string
+        nome:
+          type: string
+    v1_cbo_body:
+      required:
+      - ocupacao
+      type: object
+      properties:
+        cbo:
+          type: integer
+        familia:
+          type: integer
+        grade_grupo:
+          type: string
+        ocupacao:
+          type: string
+        perfil_ocupacional:
+          type: string
+        sinonimo:
+          type: string
+        subgrupo_pricipal:
+          type: string
+        subgrupo:
+          type: string
+    inline_response_401:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - erro
+    v1_usuario_body:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        nome:
+          type: string
+          enum:
+          - Nome do Usuário
+    inline_response_200_7:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - sucesso
+      example:
+        status: sucesso
+    inline_response_401_1:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - erro
+    inline_response_200_8:
+      type: object
+      properties:
+        competencia:
+          type: integer
+        tipo:
+          type: string
+          enum:
+          - Nome do Usuário
+        nome_arq:
+          type: string
+      example:
+      - competencia: "012022"
+        tipo: IRRF
+        nome_arq: DARF IRRF - 202201 VENC 20_02_2022.pdf
+      - competencia: "022022"
+        tipo: IRRF
+        nome_arq: DARF IRRF - 202202 VENC 20_03_2022.pdf
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      name: connect.sid
+      in: cookie
+    ApiKeyAuth:
+      type: apiKey
+      name: connect.sid
+      in: cookie
